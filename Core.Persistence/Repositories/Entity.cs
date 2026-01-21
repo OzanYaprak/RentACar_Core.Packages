@@ -2,7 +2,7 @@
 
 // Entity<TId> sınıfı, temel varlık (entity) özelliklerini ve kimlik bilgisini tutar.
 // TId: Varlığın kimlik (Id) tipini belirtir (ör. int, Guid, string).
-public class Entity<TId>
+public class Entity<TId> : IEntityTimeStamps
 {
     // Varsayılan kurucu metot. Id özelliğini tipin varsayılan değeriyle başlatır.
     public Entity()

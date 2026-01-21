@@ -5,7 +5,7 @@ using System.Linq.Expressions;
 
 namespace Core.Persistence.Repositories;
 
-public interface IAsyncRepository<TEntity, TEntityId> : IQueryable<TEntity> where TEntity : Entity<TEntityId>
+public interface IAsyncRepository<TEntity, TEntityId> : IQuery<TEntity> where TEntity : Entity<TEntityId>
 {
     // Bu metod, belirli bir koşulu sağlayan (predicate) bir TEntity nesnesini asenkron olarak veritabanından getirir.
     // predicate: Sorguda kullanılacak filtre koşulunu temsil eden bir ifade (ör. x => x.Id == 5).
