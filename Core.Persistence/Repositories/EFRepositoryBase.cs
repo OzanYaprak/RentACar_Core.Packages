@@ -213,6 +213,7 @@ public class EFRepositoryBase<TEntity, TEntityId, TContext> : IAsyncRepository<T
         return entities;                      // Güncellenmiş varlıklar geri döner.
     }
 
+    #region Helper Methods
 
     // Tek bir varlık için silme davranışını uygular.
     // hardDelete = false ise soft delete; true ise gerçekten veritabanından siler.
@@ -260,8 +261,7 @@ public class EFRepositoryBase<TEntity, TEntityId, TContext> : IAsyncRepository<T
         // Eğer bire bir ilişki tespit edilirse, soft delete'e izin verilmez ve hata fırlatılır.
         if (hasEntityHaveOneToOneRelation)
         {
-            throw new InvalidOperationException(
-                "Entity has one-to-one relationship. Soft delete causes problems if you try to create entry again by same foreign key");
+            throw new InvalidOperationException("Entity has one-to-one relationship. Soft delete causes problems if you try to create entry again by same foreign key");
         }
     }
 
@@ -352,4 +352,6 @@ public class EFRepositoryBase<TEntity, TEntityId, TContext> : IAsyncRepository<T
         // DeletedDate'i boş (null) olan, yani soft delete yapılmamış kayıtlar filtrelenerek döndürülür.
         return queryProviderQuery.Where(x => !((IEntityTimeStamps)x).DeletedDate.HasValue);
     }
+
+    #endregion 
 }
