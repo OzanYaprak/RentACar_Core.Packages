@@ -31,7 +31,7 @@ public static class IQueryablePaginateExtensions
             Count = count, // Toplam kayıt sayısı
             Items = items, // Sayfadaki kayıtlar
             Size = size,   // Sayfa başına kayıt sayısı
-            Pages = (int)Math.Ceiling((double)count / size) // Toplam sayfa sayısı
+            Pages = (int)Math.Ceiling(count / (double)size)// Toplam sayfa sayısı
         };
 
         // Sonuç olarak Paginate nesnesi döndürülür.
