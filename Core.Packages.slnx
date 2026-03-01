@@ -1,4 +1,8 @@
 <Solution>
+  <Folder Name="/Solution Items/">
+    <File Path=".editorconfig" />
+  </Folder>
   <Project Path="Core.Application/Core.Application.csproj" Id="82c2f7a5-9f9d-4343-99b3-c721f55fab54" />
+  <Project Path="Core.CrossCuttingConcerns/Core.CrossCuttingConcerns.csproj" Id="81e4266b-0030-4ead-ad0d-7ec5128a065c" />
   <Project Path="Core.Persistence/Core.Persistence.csproj" />
 </Solution>

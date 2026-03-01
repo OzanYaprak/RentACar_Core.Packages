@@ -31,5 +31,5 @@ public class Filter
     public string? Logic { get; set; }
 
     // Alt filtreleri tutan koleksiyon. Çoklu ve iç içe filtreleme için kullanılır.
-    public IEnumerable<Filter> Filters { get; set; }
+    public IEnumerable<Filter>? Filters { get; set; } = null;
 }
