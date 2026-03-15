@@ -18,5 +18,5 @@ public interface ICacheableRequest
     /// Önbelleğe alınan öğe belirtilen süre kadar geçerli kalır, ancak her erişimde sayaç sıfırlanır.
     /// Sık kullanılan veriler önbellekte kalırken, kullanılmayan veriler temizlenir.
     /// </summary>
-    public TimeSpan? SlidingExpirationTime { get; }
+    public int SlidingExpirationTime { get; }
 }

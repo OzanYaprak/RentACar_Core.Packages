@@ -1,5 +1,7 @@
 ﻿using MediatR;
 using Microsoft.Extensions.Caching.Distributed;
+using Microsoft.Extensions.Configuration;
+using Microsoft.Extensions.Logging;
 using System.Text;
 using System.Text.Json;
 
@@ -9,10 +11,13 @@ public class CachingBehavior<TRequest, TResponse> : IPipelineBehavior<TRequest, 
 {
     private readonly CacheSettings _cacheSettings;
     private readonly IDistributedCache _distributedCache;
-    public CachingBehavior(CacheSettings cacheSettings, IDistributedCache distributedCache)
+    private readonly ILogger<CachingBehavior<TRequest, TResponse>> _logger;
+
+    public CachingBehavior(IDistributedCache distributedCache, IConfiguration configuration, ILogger<CachingBehavior<TRequest, TResponse>> logger)
     {
-        _cacheSettings = cacheSettings;
+        _cacheSettings = configuration.GetSection("CacheSettings").Get<CacheSettings>() ?? throw new InvalidOperationException("CacheSettings section is missing in the configuration.");
         _distributedCache = distributedCache;
+        _logger = logger;
     }
 
     public async Task<TResponse> Handle(TRequest request, RequestHandlerDelegate<TResponse> next, CancellationToken cancellationToken)
@@ -20,16 +25,18 @@ public class CachingBehavior<TRequest, TResponse> : IPipelineBehavior<TRequest, 
         if (request.BypassCache) { return await next(); }
 
         TResponse response;
-        
+
         byte[]? cachedResponse = await _distributedCache.GetAsync(request.CacheKey, cancellationToken);
-        
+
         if (cachedResponse != null)
         {
             response = JsonSerializer.Deserialize<TResponse>(Encoding.Default.GetString(cachedResponse))!;
+
+            _logger.LogInformation($"Fetched from Cache -> {request.CacheKey}");
         }
         else
         {
-            response = await GetResponseAndAddToCache(request,next,cancellationToken);
+            response = await GetResponseAndAddToCache(request, next, cancellationToken);
         }
 
         return response;
@@ -39,13 +46,15 @@ public class CachingBehavior<TRequest, TResponse> : IPipelineBehavior<TRequest, 
     {
         TResponse response = await next();
 
-        TimeSpan cacheDuration = request.SlidingExpirationTime ?? TimeSpan.FromDays(_cacheSettings.SlidingExpirationTime); 
-        
-        DistributedCacheEntryOptions cacheOptions = new DistributedCacheEntryOptions { SlidingExpiration = cacheDuration };
+        int cacheDuration = request.SlidingExpirationTime != 0 ? request.SlidingExpirationTime : _cacheSettings.SlidingExpirationTime;
+
+        DistributedCacheEntryOptions cacheOptions = new DistributedCacheEntryOptions { SlidingExpiration = TimeSpan.FromDays(cacheDuration) };
 
         byte[] serializedData = Encoding.UTF8.GetBytes(JsonSerializer.Serialize(response));
-       
+
         await _distributedCache.SetAsync(request.CacheKey, serializedData, cacheOptions, cancellationToken);
+
+        _logger.LogInformation($"Added to Cache -> {request.CacheKey}");
 
         return response;
     }
